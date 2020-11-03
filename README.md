@@ -21,14 +21,14 @@ export class DevServer<P> extends ChainedMap<P> {
   }
 }
 
-class MyConfig extends ChainedMap {
+class WebpackChain extends ChainedMap {
   // your own methods here..
   constructor() {
     super(undefined);
     this.set('devServer', new DevServer(this));
   }
 
-  get devServer(): DevServer<MyConfig> {
+  get devServer(): DevServer<WebpackChain> {
     return this.get('devServer');
   }
 
@@ -37,7 +37,7 @@ class MyConfig extends ChainedMap {
   }
 }
 
-const myConfig = new MyConfig();
+const myConfig = new WebpackChain();
 
 myConfig.bail(true).devServer.bonjour(true);
 
