@@ -8,6 +8,8 @@ export enum OrderPositions {
   After = 'after',
 }
 
+export type MoveCallback = (args: { before(relativeKey: string): void; after(relativeKey: string): void }) => any;
+
 function relativePosition(index: number, order: OrderPositions) {
   return order === OrderPositions.Before ? index : index + 1;
 }
@@ -69,7 +71,20 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     return this.get<T>(key)!;
   }
 
-  move(key: string, order: OrderPositions, relativeKey: string) {
+  move(key: string, callback: MoveCallback) {
+    callback({
+      before: (relativeKey: string) => {
+        this.#doMove(key, OrderPositions.Before, relativeKey);
+      },
+      after: (relativeKey: string) => {
+        this.#doMove(key, OrderPositions.After, relativeKey);
+      },
+    });
+
+    return this;
+  }
+
+  #doMove = (key: string, order: OrderPositions, relativeKey: string) => {
     if (!this.store.has(key) || !this.store.has(relativeKey)) {
       return this;
     }
@@ -89,7 +104,7 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     this.store = new Map(entries);
 
     return this;
-  }
+  };
 
   merge(values: Record<string, any>, omit: string[] = []) {
     Object.keys(values).forEach((key) => {

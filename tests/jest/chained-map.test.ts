@@ -1,4 +1,4 @@
-import { ChainedMap, OrderPositions } from '../../src/chained-map';
+import { ChainedMap } from '../../src/chained-map';
 
 it('validates if a value is a chainable map object', () => {
   const chainMap = new ChainedMap(undefined);
@@ -199,7 +199,7 @@ describe('Given a ChainedMap object', () => {
       chainMap.set('zero', 0);
       chainMap.set('one', 1);
       chainMap.set('two', 2);
-      chainMap.move('two', OrderPositions.Before, 'one');
+      chainMap.move('two', ({ before }) => before('one'));
       const values = Array.from(chainMap.values());
       expect(values).toEqual([0, 2, 1]);
     });
@@ -210,7 +210,8 @@ describe('Given a ChainedMap object', () => {
       chainMap.set('two', 2);
       chainMap.set('three', 3);
       chainMap.set('four', 4);
-      chainMap.move('two', OrderPositions.After, 'three');
+      chainMap.move('two', ({ after }) => after('three'));
+
       const values = Array.from(chainMap.values());
       expect(values).toEqual([0, 1, 3, 2, 4]);
     });
@@ -223,8 +224,8 @@ describe('Given a ChainedMap object', () => {
       chainMap.set('three', 3);
       chainMap.set('four', 4);
 
-      chainMap.move('five', OrderPositions.After, 'one');
-      chainMap.move('four', OrderPositions.After, 'six');
+      chainMap.move('five', ({ after }) => after('one'));
+      chainMap.move('four', ({ after }) => after('six'));
 
       const values = Array.from(chainMap.values());
       expect(values).toEqual([0, 1, 2, 3, 4]);

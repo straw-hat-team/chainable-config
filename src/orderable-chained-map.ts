@@ -1,4 +1,4 @@
-import { ChainedMap, OrderPositions } from './chained-map';
+import { ChainedMap } from './chained-map';
 
 export class OrderableChainedMap<P> extends ChainedMap<ChainedMap<P>> {
   private key: string;
@@ -9,10 +9,10 @@ export class OrderableChainedMap<P> extends ChainedMap<ChainedMap<P>> {
   }
 
   before(key: string) {
-    return this.parent.move(this.key, OrderPositions.Before, key);
+    return this.parent.move(this.key, ({ before }) => before(key));
   }
 
   after(key: string) {
-    return this.parent.move(this.key, OrderPositions.After, key);
+    return this.parent.move(this.key, ({ after }) => after(key));
   }
 }
