@@ -1,15 +1,15 @@
 import { Chainable } from './chainable';
 import { Configurable } from './configurable';
 
-export class ChainedSet<P, S = any> extends Chainable<P> {
-  private store = new Set<S>();
+export class ChainedSet<P> extends Chainable<P> {
+  private store = new Set<any>();
 
-  add(value: S) {
+  add<T = unknown>(value: T) {
     this.store.add(value);
     return this;
   }
 
-  prepend(value: S) {
+  prepend<T = unknown>(value: T) {
     this.store = new Set([value, ...this.store]);
     return this;
   }
@@ -19,7 +19,7 @@ export class ChainedSet<P, S = any> extends Chainable<P> {
     return this;
   }
 
-  delete(value: S) {
+  delete<T = unknown>(value: T) {
     this.store.delete(value);
     return this;
   }
@@ -28,11 +28,11 @@ export class ChainedSet<P, S = any> extends Chainable<P> {
     return this.store.values();
   }
 
-  has(value: S) {
+  has<T = unknown>(value: T) {
     return this.store.has(value);
   }
 
-  merge(values: S[]) {
+  merge<T = unknown>(values: T[]) {
     this.store = new Set([...this.store, ...values]);
     return this;
   }

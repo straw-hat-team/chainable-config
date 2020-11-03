@@ -1,6 +1,6 @@
 import { ChainedMap, OrderPositions } from './chained-map';
 
-export class OrderableChainedMap<P = any, S = any> extends ChainedMap<ChainedMap<P>, S> {
+export class OrderableChainedMap<P> extends ChainedMap<ChainedMap<P>> {
   private key: string;
 
   constructor(parent: ChainedMap<P>, key: string) {

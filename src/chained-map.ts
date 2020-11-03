@@ -14,10 +14,10 @@ function relativePosition(index: number, order: OrderPositions) {
 
 const byKey = (key: string) => (entry: [string, any]) => entry[0] === key;
 
-export class ChainedMap<P, S = unknown> extends Chainable<P> {
-  protected store = new Map<string, S>();
+export class ChainedMap<P> extends Chainable<P> {
+  protected store = new Map<string, any>();
 
-  private computeAndSet(key: string, fn: () => S) {
+  private computeAndSet<T = unknown>(key: string, fn: () => T) {
     const value = fn();
     this.set(key, value);
   }
@@ -36,11 +36,11 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     return this;
   }
 
-  get(key: string) {
-    return this.store.get(key);
+  get<T = unknown>(key: string): T {
+    return (this.store.get(key) as unknown) as T;
   }
 
-  set(key: string, value: S) {
+  set<T = unknown>(key: string, value: T) {
     this.store.set(key, value);
     return this;
   }
@@ -61,12 +61,12 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     return this.store.values();
   }
 
-  getOrCompute(key: string, fn: () => S): S {
+  getOrCompute<T = unknown>(key: string, fn: () => T): T {
     if (!this.has(key)) {
       this.computeAndSet(key, fn);
     }
 
-    return this.get(key)!;
+    return this.get<T>(key)!;
   }
 
   move(key: string, order: OrderPositions, relativeKey: string) {
@@ -91,13 +91,13 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     return this;
   }
 
-  merge(values: Record<string, S>, omit: string[] = []) {
+  merge(values: Record<string, any>, omit: string[] = []) {
     Object.keys(values).forEach((key) => {
       if (omit.includes(key)) {
         return;
       }
 
-      const currentValue = this.get(key);
+      const currentValue = this.get<any>(key);
       const nextValue = values[key];
 
       if (ChainedMap.isChainedMap(currentValue)) {
@@ -107,7 +107,7 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
       }
 
       if (isMergeable(currentValue) && isMergeable(nextValue)) {
-        const mergedValue = deepMerge<S>(currentValue!, nextValue);
+        const mergedValue = deepMerge<any>(currentValue!, nextValue);
         this.set(key, mergedValue);
         return;
       }
