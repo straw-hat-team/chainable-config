@@ -14,10 +14,10 @@ function relativePosition(index: number, order: OrderPositions) {
 
 const byKey = (key: string) => (entry: [string, any]) => entry[0] === key;
 
-export class ChainedMap<P> extends Chainable<P> {
-  protected store = new Map<string, any>();
+export class ChainedMap<P, S = unknown> extends Chainable<P> {
+  protected store = new Map<string, S>();
 
-  private computeAndSet<T = unknown>(key: string, fn: () => T) {
+  private computeAndSet<T extends S>(key: string, fn: () => T) {
     const value = fn();
     this.set(key, value);
   }
@@ -36,11 +36,11 @@ export class ChainedMap<P> extends Chainable<P> {
     return this;
   }
 
-  get<T = unknown>(key: string): T {
+  get<T extends S>(key: string): T {
     return (this.store.get(key) as unknown) as T;
   }
 
-  set<T = unknown>(key: string, value: T) {
+  set<T extends S>(key: string, value: T) {
     this.store.set(key, value);
     return this;
   }
@@ -61,7 +61,7 @@ export class ChainedMap<P> extends Chainable<P> {
     return this.store.values();
   }
 
-  getOrCompute<T = unknown>(key: string, fn: () => T): T {
+  getOrCompute<T extends S>(key: string, fn: () => T): T {
     if (!this.has(key)) {
       this.computeAndSet(key, fn);
     }
