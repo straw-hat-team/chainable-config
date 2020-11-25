@@ -53,14 +53,16 @@ class MoveableValue<P, T> extends Chainable<OrderableChainedMap<P>> {
 
 export class OrderableChainedMap<P, S = unknown> extends ChainedMap<P, MoveableValue<P, S>> {
   // @ts-ignore TODO: figure out how to fix this issue
-  set<T extends S>(key: string, value: T) {
+  set<T extends S>(key: string, value: T, options: { alias?: string } = {}) {
+    const theKey = options.alias ?? key;
+
     const item = new MoveableValue<P, T>({
       parent: this,
-      key,
+      key: theKey,
       value,
     });
 
-    super.set(key, item);
+    super.set(key, item, options);
     return this;
   }
 

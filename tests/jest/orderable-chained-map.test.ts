@@ -11,16 +11,19 @@ describe('Given a OrderableChainedMap object', () => {
         .toConfig();
       expect(config).toEqual([0, 2, 1]);
     });
-    it('Then inserts the value after the other value', () => {
+    it.only('Then inserts the value after the other value', () => {
       const config = new OrderableChainedMap(undefined, { asArray: true })
         .set('zero', 0)
         .set('one', 1)
+        .set('random', 'pepeg', { alias: 'myrandom' })
         .set('two', 2)
         .set('three', 3)
         .set('four', 4)
         .move('two', ({ after }) => after('three'))
+        .move('myrandom', ({ after }) => after('four'))
         .toConfig();
-      expect(config).toEqual([0, 1, 3, 2, 4]);
+
+      expect(config).toEqual([0, 1, 3, 2, 4, 'pepeg']);
     });
 
     it('Then does not move the value if the keys do not exists', () => {

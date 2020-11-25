@@ -39,7 +39,7 @@ export class Alias<T> extends Configurable {
   }
 
   toConfig() {
-    return this.value;
+    return Chainable.toConfig(this.value);
   }
 }
 
