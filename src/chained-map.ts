@@ -3,19 +3,6 @@ import isMergeable from 'is-mergeable-object';
 import { Chainable } from './chainable';
 import { Configurable } from './configurable';
 
-export enum OrderPositions {
-  Before = 'before',
-  After = 'after',
-}
-
-export type MoveCallback = (args: { before(relativeKey: string): void; after(relativeKey: string): void }) => any;
-
-function relativePosition(index: number, order: OrderPositions) {
-  return order === OrderPositions.Before ? index : index + 1;
-}
-
-const byKey = (key: string) => (entry: [string, any]) => entry[0] === key;
-
 export type ChainedMapOptions = {
   asArray?: boolean;
 };
@@ -85,41 +72,6 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     return this.get<T>(key)!;
   }
 
-  move(key: string, callback: MoveCallback) {
-    callback({
-      before: (relativeKey: string) => {
-        this.#doMove(key, OrderPositions.Before, relativeKey);
-      },
-      after: (relativeKey: string) => {
-        this.#doMove(key, OrderPositions.After, relativeKey);
-      },
-    });
-
-    return this;
-  }
-
-  #doMove = (key: string, order: OrderPositions, relativeKey: string) => {
-    if (!this.store.has(key) || !this.store.has(relativeKey)) {
-      return this;
-    }
-
-    const entries = Array.from(this.store.entries());
-
-    const fromIndex = entries.findIndex(byKey(key));
-    const element = entries[fromIndex];
-
-    entries.splice(fromIndex, 1);
-
-    const relativeIndex = entries.findIndex(byKey(relativeKey));
-    const toIndex = relativePosition(relativeIndex, order);
-
-    entries.splice(toIndex, 0, element);
-
-    this.store = new Map(entries);
-
-    return this;
-  };
-
   merge(values: Record<string, any>, omit: string[] = []) {
     Object.keys(values).forEach((key) => {
       if (omit.includes(key)) {
@@ -130,7 +82,7 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
       const nextValue = values[key];
 
       if (ChainedMap.isChainedMap(currentValue)) {
-        // @ts-ignore FIX: figure out the casting from S to ChainedMap
+        // @ts-ignore TODO: figure out the casting from S to ChainedMap
         currentValue!.merge(nextValue);
         return;
       }

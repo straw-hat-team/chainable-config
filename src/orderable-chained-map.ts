@@ -1,18 +1,95 @@
-import { ChainedMap, ChainedMapOptions } from './chained-map';
+import { ChainedMap } from './chained-map';
+import { Chainable } from './chainable';
 
-export class OrderableChainedMap<P, S = unknown> extends ChainedMap<ChainedMap<P>, S> {
+export enum OrderPositions {
+  Before = 'before',
+  After = 'after',
+}
+
+export type MoveCallback = (args: { before(relativeKey: string): void; after(relativeKey: string): void }) => any;
+
+function relativePosition(index: number, order: OrderPositions) {
+  return order === OrderPositions.Before ? index : index + 1;
+}
+
+function byKey(key: string) {
+  return (entry: [string, any]) => entry[0] === key;
+}
+
+class MoveableValue<P, T> extends Chainable<OrderableChainedMap<P>> {
+  private value: T;
   private key: string;
 
-  constructor(parent: ChainedMap<P>, key: string, options?: ChainedMapOptions) {
-    super(parent, options);
-    this.key = key;
+  constructor(options: { parent: OrderableChainedMap<any, any>; key: string; value: T }) {
+    super(options.parent);
+    this.key = options.key;
+    this.value = options.value;
+  }
+
+  valueOf() {
+    return this.value;
+  }
+
+  toConfig() {
+    return this.value;
   }
 
   before(key: string) {
-    return this.parent.move(this.key, ({ before }) => before(key));
+    this.parent.move(this.key, ({ before }) => before(key));
+    return this;
   }
 
   after(key: string) {
-    return this.parent.move(this.key, ({ after }) => after(key));
+    this.parent.move(this.key, ({ after }) => after(key));
+    return this;
   }
+}
+
+export class OrderableChainedMap<P, S = unknown> extends ChainedMap<P, MoveableValue<P, S>> {
+  // @ts-ignore TODO: figure out how to fix this issue
+  set<T extends S>(key: string, value: T) {
+    const item = new MoveableValue<P, T>({
+      parent: this,
+      key,
+      value,
+    });
+
+    super.set(key, item);
+    return this;
+  }
+
+  move(key: string, callback: MoveCallback) {
+    callback({
+      before: (relativeKey: string) => {
+        this.#doMove(key, OrderPositions.Before, relativeKey);
+      },
+      after: (relativeKey: string) => {
+        this.#doMove(key, OrderPositions.After, relativeKey);
+      },
+    });
+
+    return this;
+  }
+
+  #doMove = (key: string, order: OrderPositions, relativeKey: string) => {
+    if (!this.store.has(key) || !this.store.has(relativeKey)) {
+      return this;
+    }
+
+    const entries = Array.from(this.store.entries());
+
+    const fromIndex = entries.findIndex(byKey(key));
+    const element = entries[fromIndex];
+
+    entries.splice(fromIndex, 1);
+
+    const relativeIndex = entries.findIndex(byKey(relativeKey));
+    const toIndex = relativePosition(relativeIndex, order);
+
+    entries.splice(toIndex, 0, element);
+
+    this.store = new Map(entries);
+
+    return this;
+  };
 }
