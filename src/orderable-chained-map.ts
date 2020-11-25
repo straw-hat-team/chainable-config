@@ -1,10 +1,10 @@
-import { ChainedMap } from './chained-map';
+import { ChainedMap, ChainedMapOptions } from './chained-map';
 
-export class OrderableChainedMap<P> extends ChainedMap<ChainedMap<P>> {
+export class OrderableChainedMap<P, S = unknown> extends ChainedMap<ChainedMap<P>, S> {
   private key: string;
 
-  constructor(parent: ChainedMap<P>, key: string) {
-    super(parent);
+  constructor(parent: ChainedMap<P>, key: string, options?: ChainedMapOptions) {
+    super(parent, options);
     this.key = key;
   }
 
