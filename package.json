@@ -32,11 +32,12 @@
   ],
   "dependencies": {
     "deepmerge": "^4.2.2",
-    "is-mergeable-object": "^1.1.1"
+    "is-mergeable-object": "^1.1.1",
+    "javascript-stringify": "^2.0.1"
   },
   "devDependencies": {
-    "@straw-hat/tsconfig": "^2.1.0",
     "@straw-hat/prettier-config": "^1.1.0",
+    "@straw-hat/tsconfig": "^2.1.0",
     "@types/jest": "^26.0.14",
     "jest": "^26.5.0",
     "rimraf": "^3.0.2",

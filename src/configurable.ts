@@ -1,3 +1,5 @@
+import { toString } from './helper';
+
 export class Configurable {
   static isConfigurable(value: unknown) {
     return value instanceof Configurable;
@@ -9,5 +11,10 @@ export class Configurable {
 
   toConfig() {
     throw new Error('toConfig method not implemented');
+  }
+
+  toString(options?: { verbose: boolean; configPrefix?: string }) {
+    const config = this.toConfig();
+    return toString(config, options);
   }
 }
