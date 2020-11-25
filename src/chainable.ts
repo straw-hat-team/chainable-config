@@ -10,7 +10,7 @@ export class Chainable<P> extends Configurable {
     this.parent = parent;
   }
 
-  static isChainable(value: unknown) {
+  static isChainable<P = unknown>(value: unknown): value is Chainable<P> {
     return value instanceof Chainable;
   }
 

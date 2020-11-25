@@ -16,14 +16,20 @@ function byKey(key: string) {
   return (entry: [string, any]) => entry[0] === key;
 }
 
+type MoveableValueArgs<T> = {
+  parent: OrderableChainedMap<any, any>;
+  key: string;
+  value: T;
+};
+
 class MoveableValue<P, T> extends Chainable<OrderableChainedMap<P>> {
   private value: T;
   private key: string;
 
-  constructor(options: { parent: OrderableChainedMap<any, any>; key: string; value: T }) {
-    super(options.parent);
-    this.key = options.key;
-    this.value = options.value;
+  constructor(args: MoveableValueArgs<T>) {
+    super(args.parent);
+    this.key = args.key;
+    this.value = args.value;
   }
 
   valueOf() {

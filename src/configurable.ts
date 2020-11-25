@@ -6,7 +6,7 @@ export interface ToStringOptions {
 }
 
 export class Configurable {
-  static isConfigurable(value: unknown) {
+  static isConfigurable(value: unknown): value is Configurable {
     return value instanceof Configurable;
   }
 
