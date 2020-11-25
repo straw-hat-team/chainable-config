@@ -9,8 +9,7 @@ it('validates if a value is a chainable object', () => {
 describe('Given a Chainable object', () => {
   describe('When calling .toConfig()', () => {
     it('Then throws an error', () => {
-      const chain = new Chainable(undefined);
-      expect(() => chain.toConfig()).toThrow();
+      expect(() => new Chainable(undefined).toConfig()).toThrow();
     });
   });
 
