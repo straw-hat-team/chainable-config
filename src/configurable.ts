@@ -5,7 +5,7 @@ export class Configurable {
     return value instanceof Configurable;
   }
 
-  static getConfig(value: unknown) {
+  static toConfig(value: unknown) {
     return Configurable.isConfigurable(value) ? ((value as unknown) as Configurable).toConfig() : value;
   }
 

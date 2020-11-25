@@ -108,12 +108,12 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
   }
 
   #asArrayConfig = (config: Record<any, any>, [_key, value]: [string, S]) => {
-    config.push(Configurable.getConfig(value));
+    config.push(Configurable.toConfig(value));
     return config;
   };
 
   #asMapConfig = (config: Record<any, any>, [key, value]: [string, S]) => {
-    config[key] = Configurable.getConfig(value);
+    config[key] = Configurable.toConfig(value);
     return config;
   };
 }
