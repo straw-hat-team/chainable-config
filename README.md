@@ -24,7 +24,7 @@ export class DevServer<P> extends ChainedMap<P> {
 class Resolve<P> extends ChainedMap<P> {
   constructor(parent: P) {
     super(parent);
-    this.set('extensions', new ChainedMap(this, {
+    this.set('extensions', new OrderableChainedMap(this, {
       // Its allows you to return the configuration as an array rather than an
       // object
       asArray: true
