@@ -166,6 +166,7 @@ describe('Given a ChainedMap object', () => {
     describe('When have some entries', () => {
       it('Then returns a configuration object', () => {
         const config = new ChainedMap(undefined)
+          .set('^image![a-zA-Z0-9$_-]+$', 'GlobalImageStub', { alias: 'images' })
           .merge({
             name: 'pepeg',
             hello: 'world',
@@ -178,6 +179,7 @@ describe('Given a ChainedMap object', () => {
         expect(config).toEqual({
           name: 'pepeg',
           hello: 'world',
+          '^image![a-zA-Z0-9$_-]+$': 'GlobalImageStub',
           answer: {
             name: 'pogchamp',
             hello: 'ubi',
@@ -193,9 +195,10 @@ describe('Given a ChainedMap object', () => {
         .set('js', 'js')
         .set('jsx', 'jsx')
         .set('complex', 'jsx')
+        .set('alias', 'pepeg', { alias: 'myalias' })
         .set('complex', new ChainedSet(undefined).add('nice'))
         .toConfig();
-      expect(config).toEqual(['js', 'jsx', ['nice']]);
+      expect(config).toEqual(['js', 'jsx', ['nice'], 'pepeg']);
     });
   });
 
@@ -203,7 +206,8 @@ describe('Given a ChainedMap object', () => {
     it('Then returns the correct string', () => {
       const pepegMap = new ChainedMap(undefined, { name: 'config.pepeg' })
         .set('twitter', 'alchemist_ubi')
-        .set('twitch', 'alchemist_ubi');
+        .set('twitch', 'alchemist_ubi')
+        .set('^image![a-zA-Z0-9$_-]+$', 'GlobalImageStub', { alias: 'images' });
       const complexSet = new ChainedSet(undefined).add('nice');
       const output = new ChainedMap(undefined, { asArray: true, name: 'config' })
         .set('js', 'js')

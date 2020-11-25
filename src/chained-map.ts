@@ -8,8 +8,43 @@ export type ChainedMapOptions = {
   asArray?: boolean;
 };
 
+type AliasArgs<T> = {
+  key: string;
+  value: T;
+  alias: string;
+};
+
+export class Alias<T> extends Configurable {
+  value: T;
+  alias: string;
+  key: string;
+
+  constructor(args: AliasArgs<T>) {
+    super();
+    this.alias = args.alias;
+    this.key = args.key;
+    this.value = args.value;
+  }
+
+  static isAlias<T = unknown>(value: unknown): value is Alias<T> {
+    return value instanceof Alias;
+  }
+
+  valueOf() {
+    return {
+      alias: this.alias,
+      key: this.key,
+      value: this.value,
+    };
+  }
+
+  toConfig() {
+    return this.value;
+  }
+}
+
 export class ChainedMap<P, S = unknown> extends Chainable<P> {
-  protected store = new Map<string, S>();
+  protected store = new Map<string, S | Alias<S>>();
   private options: ChainedMapOptions;
 
   constructor(parent: P, options: ChainedMapOptions = {}) {
@@ -26,7 +61,7 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     this.set(key, value);
   }
 
-  static isChainedMap(value: unknown) {
+  static isChainedMap<P = unknown, S = unknown>(value: unknown): value is ChainedMap<P, S> {
     return value instanceof ChainedMap;
   }
 
@@ -44,8 +79,17 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     return (this.store.get(key) as unknown) as T;
   }
 
-  set<T extends S>(key: string, value: T) {
-    this.store.set(key, value);
+  set<T extends S>(key: string, value: T, options: { alias?: string } = {}) {
+    const theKey = options.alias ?? key;
+    const theValue = options?.alias
+      ? new Alias<T>({
+          key,
+          value,
+          alias: options.alias,
+        })
+      : value;
+
+    this.store.set(theKey, theValue);
     return this;
   }
 
@@ -116,12 +160,15 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     Array.from(this.store).forEach(([key, value], index, list) => {
       const isLast = index === list.length - 1;
       const name = this.options.name ?? '';
-      output.push(`/* ${name}.get('${key}') */ `);
+      const docKey = Alias.isAlias(value) ? value.alias : key;
+      const theKey = Alias.isAlias(value) ? value.key : key;
+
+      output.push(`/* ${name}.get(${Configurable.toString(docKey, options)}) */ `);
 
       if (this.options.asArray) {
         output.push(`${Configurable.toString(value, options)}`);
       } else {
-        output.push(`${Configurable.toString(key, options)}: ${Configurable.toString(value, options)}`);
+        output.push(`${Configurable.toString(theKey, options)}: ${Configurable.toString(value, options)}`);
       }
 
       // do not add trailing comma
@@ -133,13 +180,14 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     return `${openBracket}${output.join('').trim()}${closeBracket}`;
   }
 
-  #asArrayConfig = (config: Record<any, any>, [_key, value]: [string, S]) => {
+  #asArrayConfig = (config: Record<any, any>, [_key, value]: [string, S | Alias<S>]) => {
     config.push(Configurable.toConfig(value));
     return config;
   };
 
-  #asMapConfig = (config: Record<any, any>, [key, value]: [string, S]) => {
-    config[key] = Configurable.toConfig(value);
+  #asMapConfig = (config: Record<any, any>, [key, value]: [string, S | Alias<S>]) => {
+    const theKey = Alias.isAlias(value) ? value.key : key;
+    config[theKey] = Configurable.toConfig(value);
     return config;
   };
 }
