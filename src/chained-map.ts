@@ -1,9 +1,10 @@
 import deepMerge from 'deepmerge';
 import isMergeable from 'is-mergeable-object';
 import { Chainable } from './chainable';
-import { Configurable } from './configurable';
+import { Configurable, ToStringOptions } from './configurable';
 
 export type ChainedMapOptions = {
+  name?: string;
   asArray?: boolean;
 };
 
@@ -105,6 +106,31 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     }
 
     return Array.from(this.store).reduce(this.#asMapConfig, {});
+  }
+
+  toString(options?: ToStringOptions) {
+    const openBracket = this.options.asArray ? '[' : '{';
+    const closeBracket = this.options.asArray ? ']' : '}';
+    const output: string[] = [];
+
+    Array.from(this.store).forEach(([key, value], index, list) => {
+      const isLast = index === list.length - 1;
+      const name = this.options.name ?? '';
+      output.push(`/* ${name}.get('${key}') */ `);
+
+      if (this.options.asArray) {
+        output.push(`${Configurable.toString(value, options)}`);
+      } else {
+        output.push(`${Configurable.toString(key, options)}: ${Configurable.toString(value, options)}`);
+      }
+
+      // do not add trailing comma
+      if (!isLast) {
+        output.push(`, `);
+      }
+    });
+
+    return `${openBracket}${output.join('').trim()}${closeBracket}`;
   }
 
   #asArrayConfig = (config: Record<any, any>, [_key, value]: [string, S]) => {

@@ -6,11 +6,11 @@ export function shouldShortenFunction(value: any, verbose: boolean) {
 
 export function toString(config: any, options?: { verbose?: boolean }) {
   const verbose = options?.verbose ?? false;
-  const output = stringify(config, (value, _indent, next) => {
+  const output = stringify(config, (value, spaces, next) => {
     if (shouldShortenFunction(value, verbose)) {
-      return `function () { /* omitted long function */ }`;
+      return spaces + `function () { /* omitted long function */ }`;
     }
-    return next(value);
+    return spaces + next(value);
   });
   return output ?? '';
 }

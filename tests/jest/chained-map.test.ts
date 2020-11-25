@@ -201,12 +201,18 @@ describe('Given a ChainedMap object', () => {
 
   describe('When calling .toString()', () => {
     it('Then returns the correct string', () => {
-      const output = new ChainedMap(undefined, { asArray: true })
+      const pepegMap = new ChainedMap(undefined, { name: 'config.pepeg' })
+        .set('twitter', 'alchemist_ubi')
+        .set('twitch', 'alchemist_ubi');
+      const complexSet = new ChainedSet(undefined).add('nice');
+      const output = new ChainedMap(undefined, { asArray: true, name: 'config' })
         .set('js', 'js')
         .set('jsx', 'jsx')
         .set('complex', 'jsx')
-        .set('complex', new ChainedSet(undefined).add('nice'))
+        .set('complex', complexSet)
+        .set('pepeg', pepegMap)
         .toString();
+
       expect(output).toMatchSnapshot();
     });
   });
