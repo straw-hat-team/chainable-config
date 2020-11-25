@@ -8,7 +8,8 @@ export function toString(config: any, options?: { verbose?: boolean }) {
   const verbose = options?.verbose ?? false;
   const output = stringify(config, (value, spaces, next) => {
     if (shouldShortenFunction(value, verbose)) {
-      return spaces + `function () { /* omitted long function */ }`;
+      const funcName = value.name ?? 'anonymous';
+      return spaces + `function ${funcName}() { /* omitted long function */ }`;
     }
     return spaces + next(value);
   });

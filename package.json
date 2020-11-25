@@ -1,6 +1,6 @@
 {
   "name": "@straw-hat/chainable-config",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Allow you to create Chainable configurations",
   "repository": {
     "type": "git",
