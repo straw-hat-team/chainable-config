@@ -38,8 +38,6 @@ export class ChainedSet<P, S = unknown> extends Chainable<P> {
   }
 
   toConfig() {
-    return Array.from(this.values()).map((value: unknown) => {
-      return Configurable.isConfigurable(value) ? (value as Configurable).toConfig() : value;
-    });
+    return Array.from(this.values()).map(Configurable.getConfig);
   }
 }

@@ -16,8 +16,22 @@ function relativePosition(index: number, order: OrderPositions) {
 
 const byKey = (key: string) => (entry: [string, any]) => entry[0] === key;
 
+export type ChainedMapOptions = {
+  asArray?: boolean;
+};
+
 export class ChainedMap<P, S = unknown> extends Chainable<P> {
   protected store = new Map<string, S>();
+  private options: ChainedMapOptions;
+
+  constructor(parent: P, options: ChainedMapOptions = {}) {
+    super(parent);
+    this.parent = parent;
+    this.options = {
+      asArray: false,
+      ...options,
+    };
+  }
 
   private computeAndSet<T extends S>(key: string, fn: () => T) {
     const value = fn();
@@ -134,10 +148,20 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
   }
 
   toConfig() {
-    const initialValue: Record<string, any> = {};
-    return Array.from(this.store).reduce((config, [key, value]) => {
-      config[key] = Configurable.isConfigurable(value) ? ((value as unknown) as Configurable).toConfig() : value;
-      return config;
-    }, initialValue);
+    if (this.options.asArray) {
+      return Array.from(this.store).reduce(this.#asArrayConfig, []);
+    }
+
+    return Array.from(this.store).reduce(this.#asMapConfig, {});
   }
+
+  #asArrayConfig = (config: Record<any, any>, [_key, value]: [string, S]) => {
+    config.push(Configurable.getConfig(value));
+    return config;
+  };
+
+  #asMapConfig = (config: Record<any, any>, [key, value]: [string, S]) => {
+    config[key] = Configurable.getConfig(value);
+    return config;
+  };
 }

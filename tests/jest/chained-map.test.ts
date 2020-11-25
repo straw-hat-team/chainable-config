@@ -1,3 +1,4 @@
+import { ChainedSet } from '../../src/chained-set';
 import { ChainedMap } from '../../src/chained-map';
 
 it('validates if a value is a chainable map object', () => {
@@ -229,6 +230,16 @@ describe('Given a ChainedMap object', () => {
 
       const values = Array.from(chainMap.values());
       expect(values).toEqual([0, 1, 2, 3, 4]);
+    });
+  });
+
+  describe('When asArray configuration is set', () => {
+    it('Then returns the config as an array', () => {
+      const chaiMap = new ChainedMap(undefined, { asArray: true });
+      const complex = new ChainedSet(undefined).add('nice');
+      const config = chaiMap.set('js', 'js').set('jsx', 'jsx').set('complex', 'jsx').set('complex', complex).toConfig();
+
+      expect(config).toEqual(['js', 'jsx', ['nice']]);
     });
   });
 });

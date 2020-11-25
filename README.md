@@ -21,11 +21,23 @@ export class DevServer<P> extends ChainedMap<P> {
   }
 }
 
+class Resolve<P> extends ChainedMap<P> {
+  constructor(parent: P) {
+    super(parent);
+    this.set('extensions', new ChainedMap(this, {
+      // Its allows you to return the configuration as an array rather than an
+      // object
+      asArray: true
+    }))
+  }
+}
+
 class WebpackChain extends ChainedMap {
   // your own methods here..
   constructor() {
     super(undefined);
     this.set('devServer', new DevServer(this));
+    this.set('resolve', new Resolve(this));
   }
 
   get devServer(): DevServer<WebpackChain> {
