@@ -198,4 +198,16 @@ describe('Given a ChainedMap object', () => {
       expect(config).toEqual(['js', 'jsx', ['nice']]);
     });
   });
+
+  describe('When calling .toString()', () => {
+    it('Then returns the correct string', () => {
+      const output = new ChainedMap(undefined, { asArray: true })
+        .set('js', 'js')
+        .set('jsx', 'jsx')
+        .set('complex', 'jsx')
+        .set('complex', new ChainedSet(undefined).add('nice'))
+        .toString();
+      expect(output).toMatchSnapshot();
+    });
+  });
 });

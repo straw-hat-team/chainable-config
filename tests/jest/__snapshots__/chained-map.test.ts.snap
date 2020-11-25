@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Given a ChainedMap object When calling .toString() Then returns the correct string 1`] = `"['js','jsx',['nice']]"`;
