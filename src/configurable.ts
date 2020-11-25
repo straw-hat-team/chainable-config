@@ -13,7 +13,7 @@ export class Configurable {
     throw new Error('toConfig method not implemented');
   }
 
-  toString(options?: { verbose: boolean; configPrefix?: string }) {
+  toString(options?: { verbose: boolean }) {
     const config = this.toConfig();
     return toString(config, options);
   }
