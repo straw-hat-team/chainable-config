@@ -202,6 +202,13 @@ describe('Given a ChainedMap object', () => {
     });
   });
 
+  describe('When emptyAsUndefined configuration is set', () => {
+    it('Then returns the config as undefined', () => {
+      const config = new ChainedMap(undefined, { asArray: true, emptyAsUndefined: true }).toConfig();
+      expect(config).toEqual(undefined);
+    });
+  });
+
   describe('When calling .toString()', () => {
     it('Then returns the correct string', () => {
       const pepegMap = new ChainedMap(undefined, { name: 'config.pepeg' })

@@ -27,7 +27,9 @@ class Resolve<P> extends ChainedMap<P> {
     this.set('extensions', new OrderableChainedMap(this, {
       // Its allows you to return the configuration as an array rather than an
       // object
-      asArray: true
+      asArray: true,
+      // Its allows you to return undefined in case there is not values set
+      emptyAsUndefined: true,
     }))
   }
 }

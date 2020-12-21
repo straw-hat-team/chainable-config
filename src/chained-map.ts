@@ -6,6 +6,7 @@ import { Configurable, ToStringOptions } from './configurable';
 export type ChainedMapOptions = {
   name?: string;
   asArray?: boolean;
+  emptyAsUndefined?: boolean;
 };
 
 type AliasArgs<T> = {
@@ -52,6 +53,7 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
     this.parent = parent;
     this.options = {
       asArray: false,
+      emptyAsUndefined: false,
       ...options,
     };
   }
@@ -145,6 +147,10 @@ export class ChainedMap<P, S = unknown> extends Chainable<P> {
   }
 
   toConfig() {
+    if (this.options.emptyAsUndefined && this.store.size === 0) {
+      return undefined;
+    }
+
     if (this.options.asArray) {
       return Array.from(this.store).reduce(this.#asArrayConfig, []);
     }
