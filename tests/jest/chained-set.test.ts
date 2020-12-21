@@ -45,6 +45,13 @@ describe('Given a ChainedSet object', () => {
     });
   });
 
+  describe('When emptyAsUndefined configuration is set', () => {
+    it('Then returns the config as undefined', () => {
+      const config = new ChainedSet(undefined, { emptyAsUndefined: true }).toConfig();
+      expect(config).toEqual(undefined);
+    });
+  });
+
   describe('When calling .values()', () => {
     it('Then returns the list of values', () => {
       const chainSet = new ChainedSet(undefined);

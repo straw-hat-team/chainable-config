@@ -1,8 +1,22 @@
 import { Chainable } from './chainable';
 import { Configurable } from './configurable';
 
+export type ChainedSetOptions = {
+  emptyAsUndefined?: boolean;
+};
+
 export class ChainedSet<P, S = unknown> extends Chainable<P> {
   private store = new Set<S>();
+  private options: ChainedSetOptions;
+
+  constructor(parent: P, options: ChainedSetOptions = {}) {
+    super(parent);
+    this.parent = parent;
+    this.options = {
+      emptyAsUndefined: false,
+      ...options,
+    };
+  }
 
   add<T extends S>(value: T) {
     this.store.add(value);
@@ -38,6 +52,10 @@ export class ChainedSet<P, S = unknown> extends Chainable<P> {
   }
 
   toConfig() {
+    if (this.options.emptyAsUndefined && this.store.size === 0) {
+      return undefined;
+    }
+
     return Array.from(this.values()).map(Configurable.toConfig);
   }
 }
